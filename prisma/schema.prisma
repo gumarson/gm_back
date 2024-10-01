@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String           @id @default(uuid())
+  username        String           @unique
+  name            String
+  email           String           @unique
+  password        String
+  profileImages   ProfileImage[]   // Relationship to user's profile images
+  userImageCounts UserImageCount[] // Relationship for controlling the number of profile images per user
+}
+
+model ProfileImage {
+  id        String    @id @default(uuid())
+  url       String    // Path or URL of the image
+  createdAt DateTime  @default(now()) // Creation date of the image
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+model UserImageCount {
+  id       String          @id @default(uuid())
+  user     User            @relation(fields: [userId], references: [id])
+  userId   String
+  imageNum MaxProfileImages
+  @@unique([userId, imageNum])
+}
+
+enum MaxProfileImages {
+  IMAGE_1
+  IMAGE_2
+  IMAGE_3
+  IMAGE_4
+  IMAGE_5
+  IMAGE_6
+}
